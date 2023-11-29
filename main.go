@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 )
@@ -55,11 +57,38 @@ func getAlbumByID(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
+func deleteAlbumByID(c *gin.Context) {
+	id := c.Param("id")
+
+	// convert array albums[] to map
+	albumsMap := make(map[interface{}]interface{})
+	for i := 0; i < len(albums); i++ {
+		if i == len(albums)-1 {
+			break
+		}
+		albumsMap[albums[i]] = albums[i+1]
+	}
+
+	// Loop over the list of albums, looking for an album whose ID value mathces the parameter.
+	for i, key := range albumsMap {
+		t := reflect.ValueOf(key)
+		s := t.FieldByName("ID")
+		if id == s.String() {
+			delete(albumsMap, i)
+
+			fmt.Println(albumsMap)
+
+			c.IndentedJSON(http.StatusOK, albumsMap)
+		}
+	}
+}
+
 func main() {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbums)
+	router.DELETE("albums/:id", deleteAlbumByID)
 
 	router.Run("localhost:8080")
 }
