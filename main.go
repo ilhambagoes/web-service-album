@@ -63,22 +63,26 @@ func deleteAlbumByID(c *gin.Context) {
 	// convert array albums[] to map
 	albumsMap := make(map[interface{}]interface{})
 	for i := 0; i < len(albums); i++ {
-		if i == len(albums)-1 {
+		albumsMap[i+1] = albums[i]
+		if i == len(albums) {
 			break
 		}
-		albumsMap[albums[i]] = albums[i+1]
 	}
 
 	// Loop over the list of albums, looking for an album whose ID value mathces the parameter.
 	for i, keysMap := range albumsMap {
 		key := reflect.ValueOf(keysMap)
 		idMap := key.FieldByName("ID")
+
+		fmt.Println(id, idMap)
+
 		if id == idMap.String() {
 			delete(albumsMap, i)
 
 			fmt.Println(albumsMap)
 
 			c.IndentedJSON(http.StatusOK, albumsMap)
+			break
 		}
 	}
 }
