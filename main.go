@@ -70,10 +70,10 @@ func deleteAlbumByID(c *gin.Context) {
 	}
 
 	// Loop over the list of albums, looking for an album whose ID value mathces the parameter.
-	for i, key := range albumsMap {
-		t := reflect.ValueOf(key)
-		s := t.FieldByName("ID")
-		if id == s.String() {
+	for i, keysMap := range albumsMap {
+		key := reflect.ValueOf(keysMap)
+		idMap := key.FieldByName("ID")
+		if id == idMap.String() {
 			delete(albumsMap, i)
 
 			fmt.Println(albumsMap)
