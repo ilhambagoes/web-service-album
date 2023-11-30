@@ -64,9 +64,6 @@ func deleteAlbumByID(c *gin.Context) {
 	albumsMap := make(map[interface{}]interface{})
 	for i := 0; i < len(albums); i++ {
 		albumsMap[i+1] = albums[i]
-		if i == len(albums) {
-			break
-		}
 	}
 
 	// Loop over the list of albums, looking for an album whose ID value mathces the parameter.
