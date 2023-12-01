@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -61,7 +62,7 @@ func deleteAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 
 	// convert array albums[] to map
-	albumsMap := make(map[interface{}]interface{})
+	albumsMap := make(map[int]interface{})
 	for i := 0; i < len(albums); i++ {
 		albumsMap[i+1] = albums[i]
 	}
@@ -76,9 +77,10 @@ func deleteAlbumByID(c *gin.Context) {
 		if id == idMap.String() {
 			delete(albumsMap, i)
 
-			fmt.Println(albumsMap)
+			// Convert map to json
+			jsonString, _ := json.Marshal(albumsMap)
 
-			c.IndentedJSON(http.StatusOK, albumsMap)
+			c.IndentedJSON(http.StatusOK, string(jsonString))
 			break
 		}
 	}
