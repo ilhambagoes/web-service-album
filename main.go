@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 )
 
 // album represents data about a record album
-type album struct {
+type Album struct {
 	ID     string  `json:"id"`
 	Title  string  `json:"title"`
 	Artist string  `json:"artist"`
@@ -17,7 +18,7 @@ type album struct {
 }
 
 // album slices to seed record album data.
-var albums = []album{
+var albums = []Album{
 	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
 	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
 	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
@@ -30,7 +31,7 @@ func getAlbums(c *gin.Context) {
 
 // postAlbums adds an album from JSON received in the request body
 func postAlbums(c *gin.Context) {
-	var newAlbum album
+	var newAlbum Album
 
 	// call BindJSON to bind the received JSON to newAlbum
 	if err := c.BindJSON(&newAlbum); err != nil {
@@ -61,10 +62,10 @@ func deleteAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 
 	// Declare array response for after delete
-	res := make([]interface{}, 0)
+	res := make([]Album, 0)
 
 	// convert array albums[] to map
-	albumsMap := make(map[int]interface{})
+	albumsMap := make(map[int]Album)
 	for i := 0; i < len(albums); i++ {
 		albumsMap[i+1] = albums[i]
 	}
@@ -83,8 +84,9 @@ func deleteAlbumByID(c *gin.Context) {
 				res = append(res, key)
 			}
 
-			// Convert map to json
-			//jsonString, _ := json.Marshal(albumsMap)
+			sort.Slice(res, func(i, j int) bool {
+				return res[i].ID < res[j].ID
+			})
 
 			c.IndentedJSON(http.StatusOK, res)
 			break
